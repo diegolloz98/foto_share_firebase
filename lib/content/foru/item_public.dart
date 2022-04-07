@@ -1,4 +1,10 @@
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+
 
 class ItemPublic extends StatefulWidget {
   final Map<String, dynamic> publicFData;
@@ -40,7 +46,21 @@ class _ItemPublicState extends State<ItemPublic> {
                   IconButton(
                     tooltip: "Compartir",
                     icon: Icon(Icons.share),
-                    onPressed: () {},
+                    onPressed: () async{
+                      final urlImage =
+                          '${widget.publicFData["picture"]}';
+                      final url = Uri.parse(urlImage);
+                      final response = await http.get(url);
+                      final bytes = response.bodyBytes;
+                      
+                      final temp = await getTemporaryDirectory();
+                      final path = '${temp.path}/image.png';
+                      File(path).writeAsBytesSync(bytes);
+                      
+
+                      await Share.shareFiles([path], text: '${widget.publicFData["title"]}  ${widget.publicFData["publishedAt"].toDate()}');
+
+                    },
                   ),
                 ],
               ),
